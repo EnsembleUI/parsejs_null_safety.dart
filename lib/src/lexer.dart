@@ -3,11 +3,11 @@ library lexer;
 import 'charcode.dart' as char;
 import 'package:unicode/unicode.dart' as unicode;
 
-class ParseError {
+class ParseError implements Exception {
   String message;
-  String filename;
-  int line; // 1-based line number.
-  int startOffset;
+  String? filename;
+  int? line; // 1-based line number.
+  int? startOffset;
   int endOffset;
 
   ParseError(
@@ -19,13 +19,13 @@ class ParseError {
 }
 
 class Token {
-  int startOffset;
-  int line;
+  int? startOffset;
+  int? line;
   int type;
-  String
+  String?
       text; // text exactly as in source code or null for EOF or tokens with type > 31
-  bool afterLinebreak; // true if first token after a linebreak
-  String
+  bool? afterLinebreak; // true if first token after a linebreak
+  String?
       value; // value of identifier or string literal after escapes, null for other tokens
 
   /// For tokens that can be used as binary operators, this indicates their relative precedence.
@@ -35,11 +35,11 @@ class Token {
 
   Token(this.startOffset, this.line, this.type, this.afterLinebreak, this.text);
 
-  String toString() => text != null ? text : typeToString(type);
+  String toString() => text != null ? text! : typeToString(type);
 
   String get detailedString => "[$startOffset, $text, $type, $afterLinebreak]";
 
-  int get endOffset => startOffset + (text == null ? 1 : text.length);
+  int get endOffset => startOffset! + (text == null ? 1 : text!.length);
 
   static const int EOF = 0;
   static const int NAME = 1;
@@ -180,14 +180,14 @@ class Lexer {
     }
   }
 
-  List<int> input;
+  late List<int> input;
   int index = 0;
-  int endOfFile;
-  int tokenStart;
-  int tokenLine;
+  int? endOfFile;
+  int? tokenStart;
+  int? tokenLine;
   int currentLine; // We use 1-based line numbers.
-  bool seenLinebreak;
-  String filename;
+  bool? seenLinebreak;
+  String? filename;
 
   int get current => index == endOfFile ? char.NULL : input[index];
 
@@ -200,12 +200,12 @@ class Lexer {
     throw new ParseError(message, filename, currentLine, tokenStart, index);
   }
 
-  Token emitToken(int type, [String value]) {
+  Token emitToken(int type, [String? value]) {
     return new Token(tokenStart, tokenLine, type, seenLinebreak, value);
   }
 
   Token emitValueToken(int type) {
-    String value = new String.fromCharCodes(input.getRange(tokenStart, index));
+    String value = new String.fromCharCodes(input.getRange(tokenStart!, index));
     return new Token(tokenStart, tokenLine, type, seenLinebreak, value);
   }
 
@@ -270,7 +270,7 @@ class Lexer {
 
   Token scanComplexName(int x) {
     // name with unicode escape sequences
-    List<int> buffer = new List<int>.from(input.getRange(tokenStart, index));
+    List<int> buffer = new List<int>.from(input.getRange(tokenStart!, index));
     while (true) {
       if (x == char.BACKSLASH) {
         x = next();
@@ -602,7 +602,7 @@ class Lexer {
   /// Scan a regular expression literal, where the opening token has already been scanned
   /// This is called directly from the parser.
   /// The opening token [slash] can be a "/" or a "/=" token
-  Token scanRegexpBody(Token slash) {
+  Token scanRegexpBody(Token? slash) {
     bool inCharClass =
         false; // If true, we are inside a bracket. A slash in here does not terminate the literal. They are not nestable.
     int x = current;
@@ -635,7 +635,7 @@ class Lexer {
       x = next();
     }
     return emitToken(Token.REGEXP,
-        new String.fromCharCodes(input.getRange(slash.startOffset, index)));
+        new String.fromCharCodes(input.getRange(slash!.startOffset!, index)));
   }
 
   Token scanStringLiteral(int x) {

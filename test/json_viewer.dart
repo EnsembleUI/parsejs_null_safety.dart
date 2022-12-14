@@ -13,7 +13,7 @@ Program parseInput(String text) {
 main() {
   while (true) {
     stdout.write('> ');
-    var input = stdin.readLineSync();
+    var input = stdin.readLineSync()!;
     try {
       var program = parseInput(input);
       print(new Ast2Json().visit(program));
