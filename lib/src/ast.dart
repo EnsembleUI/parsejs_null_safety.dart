@@ -124,6 +124,27 @@ class FunctionNode extends Scope {
   visitBy1<T, A>(Visitor1<T, A> v, A arg) => v.visitFunctionNode(this, arg);
 }
 
+class ArrowFunctionNode extends Scope {
+  final List<Name> params;
+  final Statement body;
+
+  ArrowFunctionNode(this.params, this.body);
+
+  bool get isExpression => true;  // Arrow functions are always expressions
+  bool get isDeclaration => false;  // Arrow functions are not declarations
+  bool get isAccessor => false;  // Arrow functions are not accessors
+
+  forEach(callback) {
+    params.forEach(callback);
+    callback(body);
+  }
+
+  String toString() => 'ArrowFunctionNode';
+
+  visitBy<T>(Visitor<T> v) => v.visitArrowFunctionNode(this);
+  visitBy1<T, A>(Visitor1<T, A> v, A arg) => v.visitArrowFunctionNode(this, arg);
+}
+
 /// Mention of a variable, property, or label.
 class Name extends Node {
   /// Name being referenced.

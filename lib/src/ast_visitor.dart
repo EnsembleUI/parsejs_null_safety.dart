@@ -31,6 +31,7 @@ abstract class Visitor<T> {
   T visitFor(ForStatement node);
   T visitForIn(ForInStatement node);
   T visitFunctionDeclaration(FunctionDeclaration node);
+  T visitArrowFunctionNode(ArrowFunctionNode node);
   T visitVariableDeclaration(VariableDeclaration node);
   T visitVariableDeclarator(VariableDeclarator node);
   T visitDebugger(DebuggerStatement node);
@@ -96,6 +97,7 @@ class BaseVisitor<T> implements Visitor<T?> {
   T? visitObject(ObjectExpression node) => defaultNode(node);
   T? visitProperty(Property node) => defaultNode(node);
   T? visitFunctionExpression(FunctionExpression node) => defaultNode(node);
+  T? visitArrowFunctionNode(ArrowFunctionNode node) => defaultNode(node);
   T? visitSequence(SequenceExpression node) => defaultNode(node);
   T? visitUnary(UnaryExpression node) => defaultNode(node);
   T? visitBinary(BinaryExpression node) => defaultNode(node);
@@ -165,6 +167,7 @@ abstract class Visitor1<T, A> {
   T visitFor(ForStatement node, A arg);
   T visitForIn(ForInStatement node, A arg);
   T visitFunctionDeclaration(FunctionDeclaration node, A arg);
+  T visitArrowFunctionNode(ArrowFunctionNode node, A arg);
   T visitVariableDeclaration(VariableDeclaration node, A arg);
   T visitVariableDeclarator(VariableDeclarator node, A arg);
   T visitDebugger(DebuggerStatement node, A arg);
@@ -223,6 +226,8 @@ class BaseVisitor1<T, A> implements Visitor1<T?, A> {
   T? visitFor(ForStatement node, A arg) => defaultNode(node, arg);
   T? visitForIn(ForInStatement node, A arg) => defaultNode(node, arg);
   T? visitFunctionDeclaration(FunctionDeclaration node, A arg) =>
+      defaultNode(node, arg);
+  T? visitArrowFunctionNode(ArrowFunctionNode node, A arg) =>
       defaultNode(node, arg);
   T? visitVariableDeclaration(VariableDeclaration node, A arg) =>
       defaultNode(node, arg);

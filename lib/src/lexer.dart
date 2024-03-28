@@ -52,6 +52,7 @@ class Token {
       6; // all unary operators except the names void, delete
   static const int STRING = 7;
   static const int REGEXP = 8;
+  static const int ARROW = 9;
 
   // Tokens without a text have type equal to their corresponding char code
   // All these are >31
@@ -66,6 +67,8 @@ class Token {
   static const int SEMICOLON = char.SEMICOLON;
   static const int DOT = char.DOT;
   static const int QUESTION = char.QUESTION;
+  static const int EQUAL = char.EQ;
+  static const int GT = char.GT;
 
   static String typeToString(int type) {
     if (type > 31) return "'${new String.fromCharCode(type)}'";
@@ -542,6 +545,8 @@ class Lexer {
             }
             return emitToken(Token.BINARY, '==')
               ..binaryPrecedence = Precedence.EQUALITY;
+          } else if (x == char.GT) {
+            return emitToken(Token.ARROW, '=>');
           }
           return emitToken(Token.ASSIGN, '=');
 

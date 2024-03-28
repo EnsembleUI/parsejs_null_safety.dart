@@ -1,5 +1,7 @@
 library parser;
 
+import 'package:jsparser/jsparser.dart';
+
 import 'lexer.dart';
 import 'ast.dart';
 
@@ -109,7 +111,50 @@ class Parser {
   BlockStatement parseFunctionBody() {
     return parseBlock();
   }
-
+  BlockStatement parseArrowFunctionBody() {
+    if (token!.type == Token.LBRACE) {
+      return parseBlock();
+    }
+    Expression exp = parseExpression();
+    if ( token!.type == Token.SEMICOLON ) {
+      consumeSemicolon();
+    }
+    return new BlockStatement([new ReturnStatement(exp)]);
+  }
+  FunctionNode parseArrowFunction(Expression? exp) {
+    int? start = token!.startOffset;
+    // List<Name> params;
+    // if (token!.type == Token.LPAREN) {
+    //   params = parseParameters();
+    // } else {
+    //   params = <Name>[];
+    // }
+    List<Name> params = <Name>[];
+    if ( exp != null ) {
+      if (exp is SequenceExpression) {
+        for (var e in exp.expressions) {
+          if (e is NameExpression) {
+            params.add(e.name);
+          } else {
+            throw fail();
+          }
+        }
+      } else if (exp is NameExpression) {
+        params.add(exp.name);
+      } else {
+        throw fail();
+      }
+    }
+    consume(Token.ARROW);
+    next();
+    //Expression body = parseExpression();
+    //return new FunctionNode(null, params, new BlockStatement([new ReturnStatement(body)]))
+    BlockStatement body = parseArrowFunctionBody();
+    return new FunctionNode(null, params, body)
+      ..start = start
+      ..end = endOffset
+      ..line = token!.line;
+  }
   FunctionNode parseFunction() {
     int? start = token!.startOffset;
     assert(token!.text == 'function');
@@ -188,9 +233,16 @@ class Parser {
 
       case Token.LPAREN:
         next();
-        Expression exp = parseExpression();
+        Expression? exp;
+        if ( token!.type != Token.RPAREN ) {
+          exp = parseExpression();
+        }
         consume(Token.RPAREN);
-        return exp;
+        if (token!.type == Token.ARROW) {
+          return new FunctionExpression(parseArrowFunction(exp));
+        } else {
+          return exp!;
+        }
 
       case Token.BINARY:
       case Token.ASSIGN:
