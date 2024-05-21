@@ -1,3 +1,5 @@
+(This repo is deprecated. Please use the monorepo [Ensemble](https://github.com/EnsembleUI/ensemble) instead).
+
 # JSParser
 
 **JSParser** is an updgraded version, for Dart 2.4 and above, of **ParseJS**. **ParseJS** is a JavaScript parser for Dart. It is well-tested and is reasonably efficient.
